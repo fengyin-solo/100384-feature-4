@@ -32,6 +32,16 @@ export type ActionResult = {
   message: string
 }
 
+/** 清理轨道动作弹窗收集的落库信息：每个阶段都要落清操作人、完成时间、遗留问题。 */
+export type CleaningActionDetail = {
+  operator: string
+  finishedAt: string
+  leftover: string
+  /** 完成测绘阶段：现场测量结论与室内复核结论，冲突时以室内复核结论为准。 */
+  fieldConclusion: string
+  reviewConclusion: string
+}
+
 export type OverviewResult = {
   cards: { label: string; value: number }[]
   modules: { name: string; created: number; pending: number; abnormal: number }[]

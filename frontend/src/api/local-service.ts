@@ -1,6 +1,14 @@
 import { MODULE_BY_KEY } from '@/data/modules'
+import { normalizeFeatureRow, runCleaningAction } from '@/data/feature-track'
 import { allRows, listRows, resetRows, saveRows } from '@/data/local-store'
-import type { ActionResult, EntryRow, ModuleMeta, OverviewResult, PageResult } from '@/data/types'
+import type {
+  ActionResult,
+  CleaningActionDetail,
+  EntryRow,
+  ModuleMeta,
+  OverviewResult,
+  PageResult,
+} from '@/data/types'
 
 // 会写进数据的「往回走」动作：命中就把这条记录标成异常态，看板上能一眼看出来。
 const NEGATIVE_ACTIONS = ['撤销', '作废', '拒绝', '驳回', '停用', '忽略', '下线', '回滚']
@@ -24,11 +32,21 @@ export function filterRows(rows: EntryRow[], filters: Record<string, string>): E
 }
 
 export function listEntries(key: string, filters: Record<string, string> = {}): PageResult {
-  const matched = filterRows(listRows(key), filters)
+  const rows = key === 'feature' ? listRows(key).map(normalizeFeatureRow) : listRows(key)
+  const matched = filterRows(rows, filters)
   return { items: matched, total: matched.length, page: 1, size: matched.length }
 }
 
-export function runAction(key: string, id: number, action: string): ActionResult {
+export function runAction(
+  key: string,
+  id: number,
+  action: string,
+  detail?: CleaningActionDetail,
+): ActionResult {
+  // 遗迹清理轨道：阶段顺向流转，每阶段落清操作人、完成时间、遗留问题。
+  if (key === 'feature' && detail) {
+    return runCleaningAction(id, action, detail)
+  }
   const meta = moduleMeta(key)
   const target = meta.actionTargets[action]
   if (!target) {
@@ -65,7 +83,8 @@ export function exportEntries(key: string): { filename: string; content: string 
   const meta = moduleMeta(key)
   const header = ['编号', ...meta.fields, '当前状态']
   const lines = [header.join(',')]
-  for (const row of listRows(key)) {
+  const rows = key === 'feature' ? listRows(key).map(normalizeFeatureRow) : listRows(key)
+  for (const row of rows) {
     lines.push([row.id, ...meta.fields.map((field) => row[field] ?? ''), row.status].join(','))
   }
   return { filename: `${meta.name}-清单.csv`, content: `\uFEFF${lines.join('\n')}` }

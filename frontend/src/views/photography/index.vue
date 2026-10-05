@@ -82,7 +82,7 @@ import {
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('photography')
-const columns = ["影像编号", "拍摄对象", "拍摄类型", "拍摄方位", "拍摄日期", "摄影人员", "存储路径", "影像状态"]
+const columns = ["影像编号", "拍摄对象", "拍摄类型", "拍摄方位", "拍摄日期", "摄影人员", "存储路径", "待复拍事项", "影像状态"]
 const actions = ["分配编号", "提交归档", "安排重拍"]
 const statuses = ["已拍摄", "已编号", "已归档", "需重拍"]
 const stats = [{"label": "影像总数", "value": 0}, {"label": "已归档数", "value": 0}, {"label": "待编号数", "value": 0}]
