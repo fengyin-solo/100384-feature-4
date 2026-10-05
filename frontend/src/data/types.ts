@@ -32,6 +32,14 @@ export type ActionResult = {
   message: string
 }
 
+// 动作附带的现场录入：遗迹清理轨道用它落清操作人、遗留问题与测绘两份结论；其他模块忽略。
+export type ActionExtra = {
+  operator?: string
+  issue?: string
+  fieldSurvey?: string
+  labReview?: string
+}
+
 export type OverviewResult = {
   cards: { label: string; value: number }[]
   modules: { name: string; created: number; pending: number; abnormal: number }[]
